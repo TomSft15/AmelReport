@@ -5,7 +5,42 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { articleSchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
+
+// Configuration sanitize-html pour l'éditeur Tiptap
+const sanitizeOptions = {
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'img', 'figure', 'figcaption',
+    'pre', 'code',
+    'blockquote', 'cite',
+    'mark', 'del', 'ins',
+    'hr', 'br',
+    'video', 'audio', 'source',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+  ]),
+  allowedAttributes: {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    '*': ['class', 'id', 'style'],
+    a: ['href', 'name', 'target', 'rel'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+    video: ['src', 'controls', 'width', 'height'],
+    audio: ['src', 'controls'],
+    source: ['src', 'type'],
+    code: ['class'],
+    pre: ['class'],
+  },
+  allowedStyles: {
+    '*': {
+      'color': [/^#[0-9a-f]{3,6}$/i, /^rgb\(/i, /^rgba\(/i],
+      'background-color': [/^#[0-9a-f]{3,6}$/i, /^rgb\(/i, /^rgba\(/i],
+      'text-align': [/^left$/i, /^right$/i, /^center$/i, /^justify$/i],
+      'font-size': [/^\d+(?:px|em|rem|%)$/],
+      'font-weight': [/^\d+$/, /^bold$/, /^normal$/],
+      'text-decoration': [/^underline$/, /^line-through$/],
+    },
+  },
+};
 
 export async function createArticle(formData: FormData) {
   const supabase = await createServerSupabaseClient();
@@ -32,7 +67,7 @@ export async function createArticle(formData: FormData) {
   const data = {
     title: formData.get("title") as string,
     slug: generateSlug(formData.get("title") as string),
-    content: DOMPurify.sanitize(formData.get("content") as string),
+    content: sanitizeHtml(formData.get("content") as string, sanitizeOptions),
     excerpt: formData.get("excerpt") as string || null,
     coverImageUrl: formData.get("coverImageUrl") as string || null,
     status: formData.get("status") as "draft" | "published",
@@ -74,7 +109,10 @@ export async function createArticle(formData: FormData) {
     .single()) as any;
 
   if (articleError || !article) {
-    return { error: "Erreur lors de la création de l'article" };
+    console.error("Article creation error:", articleError);
+    return {
+      error: articleError?.message || "Erreur lors de la création de l'article",
+    };
   }
 
   // Add categories
@@ -118,7 +156,7 @@ export async function updateArticle(id: string, formData: FormData) {
   const data = {
     title: formData.get("title") as string,
     slug: generateSlug(formData.get("title") as string),
-    content: DOMPurify.sanitize(formData.get("content") as string),
+    content: sanitizeHtml(formData.get("content") as string, sanitizeOptions),
     excerpt: formData.get("excerpt") as string || null,
     coverImageUrl: formData.get("coverImageUrl") as string || null,
     status: formData.get("status") as "draft" | "published",
@@ -160,7 +198,10 @@ export async function updateArticle(id: string, formData: FormData) {
     .eq("id", id);
 
   if (articleError) {
-    return { error: "Erreur lors de la mise à jour de l'article" };
+    console.error("Article update error:", articleError);
+    return {
+      error: articleError?.message || "Erreur lors de la mise à jour de l'article",
+    };
   }
 
   // Update categories - delete old ones and add new ones
@@ -205,7 +246,7 @@ export async function saveDraft(id: string, content: string) {
   }
 
   // Sanitize content
-  const sanitizedContent = DOMPurify.sanitize(content);
+  const sanitizedContent = sanitizeHtml(content, sanitizeOptions);
 
   // Update article content
   const { error } = await supabase
