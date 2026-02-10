@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Menu,
   X,
+  Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -98,6 +99,19 @@ export function Sidebar() {
                 </Link>
               );
             })}
+
+            {/* Separator */}
+            <div className="my-2 border-t" />
+
+            {/* Link to public interface */}
+            <Link
+              href="/home"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <Home className="h-5 w-5" />
+              Voir le blog
+            </Link>
           </nav>
 
           {/* Footer */}

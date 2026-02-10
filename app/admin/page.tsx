@@ -99,6 +99,21 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Actions rapides</CardTitle>
+        </CardHeader>
+        <CardContent className="flex gap-4">
+          <Button asChild>
+            <Link href="/admin/articles/new">Nouvel article</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/admin/users">Inviter un utilisateur</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-4 md:grid-cols-2">
         {/* Recent Articles */}
         <Card>
@@ -198,21 +213,6 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Actions rapides</CardTitle>
-        </CardHeader>
-        <CardContent className="flex gap-4">
-          <Button asChild>
-            <Link href="/admin/articles/new">Nouvel article</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/admin/users">Inviter un utilisateur</Link>
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }

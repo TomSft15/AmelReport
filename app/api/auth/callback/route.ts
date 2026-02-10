@@ -13,30 +13,12 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Check if user email exists in profiles
+      // Update last login
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (user?.email) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("invitation_status")
-          .eq("email", user.email)
-          .single();
-
-        // If profile doesn't exist or not invited, sign out
-        if (!profile) {
-          await supabase.auth.signOut();
-          return NextResponse.redirect(
-            new URL(
-              "/auth/login?error=not_invited",
-              request.url
-            )
-          );
-        }
-
-        // Update last login
+      if (user) {
         try {
           const { error: updateError } = await supabase
             .from("profiles")

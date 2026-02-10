@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb", // Augmenté de 1MB à 5MB pour les articles longs
+    },
+  },
 };
 
 export default nextConfig;

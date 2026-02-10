@@ -12,21 +12,21 @@ export default async function InvitationPage({
   const { token } = await params;
   const supabase = await createServerSupabaseClient();
 
-  // Find profile with this token
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("email, invitation_status, invitation_expires_at")
-    .eq("invitation_token", token)
+  // Find invitation with this token
+  const { data: invitation, error } = await supabase
+    .from("invitations")
+    .select("email, status, expires_at")
+    .eq("token", token)
     .single() as {
     data: {
       email: string;
-      invitation_status: string;
-      invitation_expires_at: string | null;
+      status: string;
+      expires_at: string;
     } | null;
     error: any;
   };
 
-  if (error || !profile) {
+  if (error || !invitation) {
     return (
       <Card>
         <CardHeader>
@@ -46,7 +46,7 @@ export default async function InvitationPage({
   }
 
   // Check if already accepted
-  if (profile.invitation_status === "active") {
+  if (invitation.status === "accepted") {
     return (
       <Card>
         <CardHeader>
@@ -68,8 +68,8 @@ export default async function InvitationPage({
 
   // Check if expired
   if (
-    profile.invitation_expires_at &&
-    new Date(profile.invitation_expires_at) < new Date()
+    invitation.expires_at &&
+    new Date(invitation.expires_at) < new Date()
   ) {
     return (
       <Card>
@@ -90,5 +90,5 @@ export default async function InvitationPage({
     );
   }
 
-  return <InvitationForm token={token} email={profile.email} />;
+  return <InvitationForm token={token} email={invitation.email} />;
 }

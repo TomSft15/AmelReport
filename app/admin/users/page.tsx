@@ -27,6 +27,13 @@ export default async function UsersPage() {
     .select("*")
     .order("created_at", { ascending: false }) as any;
 
+  // Get pending invitations
+  const { data: invitations } = await supabase
+    .from("invitations")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: false }) as any;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -39,6 +46,52 @@ export default async function UsersPage() {
         <UserInviteModal />
       </div>
 
+      {/* Pending invitations */}
+      {invitations && invitations.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Invitations en attente</CardTitle>
+            <CardDescription>
+              {invitations.length} invitation(s) en attente de réponse
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Invité le</TableHead>
+                  <TableHead>Expire le</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invitations.map((invitation: any) => (
+                  <TableRow key={invitation.id}>
+                    <TableCell className="font-medium">{invitation.email}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {formatDate(invitation.created_at)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">
+                      {formatDate(invitation.expires_at)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <UserActions
+                        userId={invitation.id}
+                        email={invitation.email}
+                        status="pending"
+                        isCurrentUser={false}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Active users */}
       <Card>
         <CardHeader>
           <CardTitle>Liste des utilisateurs</CardTitle>

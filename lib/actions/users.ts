@@ -37,15 +37,27 @@ export async function inviteUser(formData: FormData) {
     return { error: result.error.issues[0]?.message || "Email invalide" };
   }
 
-  // Check if email already exists
-  const { data: existing } = await supabase
+  // Check if email already exists in profiles
+  const { data: existingProfile } = await supabase
     .from("profiles")
     .select("id")
     .eq("email", data.email)
     .single();
 
-  if (existing) {
-    return { error: "Cet email est déjà invité" };
+  if (existingProfile) {
+    return { error: "Cet email est déjà inscrit" };
+  }
+
+  // Check if email already has a pending invitation
+  const { data: existingInvitation } = await supabase
+    .from("invitations")
+    .select("id")
+    .eq("email", data.email)
+    .eq("status", "pending")
+    .single();
+
+  if (existingInvitation) {
+    return { error: "Une invitation est déjà en attente pour cet email" };
   }
 
   // Generate token and expiration (7 days)
@@ -53,18 +65,17 @@ export async function inviteUser(formData: FormData) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  // Create profile
-  // @ts-ignore - Supabase types issue
-  const { error: insertError } = await supabase.from("profiles").insert({
-    id: crypto.randomUUID(),
+  // Create invitation
+  const { error: insertError } = await supabase.from("invitations").insert({
     email: data.email,
-    invitation_token: token,
-    invitation_expires_at: expiresAt.toISOString(),
-    invitation_status: "pending",
+    token: token,
+    expires_at: expiresAt.toISOString(),
+    status: "pending",
     invited_by: user.id,
   });
 
   if (insertError) {
+    console.error("Error creating invitation:", insertError);
     return { error: "Erreur lors de la création de l'invitation" };
   }
 
@@ -150,18 +161,18 @@ export async function resendInvitation(userId: string) {
     return { error: "Accès non autorisé" };
   }
 
-  // Get user profile
-  const { data: targetProfile } = await supabase
-    .from("profiles")
+  // Get invitation (userId is now the invitation id, not profile id)
+  const { data: invitation } = await supabase
+    .from("invitations")
     .select("*")
     .eq("id", userId)
     .single() as any;
 
-  if (!targetProfile) {
-    return { error: "Utilisateur introuvable" };
+  if (!invitation) {
+    return { error: "Invitation introuvable" };
   }
 
-  if (targetProfile.invitation_status !== "pending") {
+  if (invitation.status !== "pending") {
     return { error: "Cette invitation a déjà été acceptée" };
   }
 
@@ -171,15 +182,15 @@ export async function resendInvitation(userId: string) {
   expiresAt.setDate(expiresAt.getDate() + 7);
 
   const { error } = await supabase
-    .from("profiles")
-    // @ts-ignore - Supabase types issue
+    .from("invitations")
     .update({
-      invitation_token: token,
-      invitation_expires_at: expiresAt.toISOString(),
+      token: token,
+      expires_at: expiresAt.toISOString(),
     })
     .eq("id", userId);
 
   if (error) {
+    console.error("Error resending invitation:", error);
     return { error: "Erreur lors du renvoi de l'invitation" };
   }
 
