@@ -41,11 +41,20 @@ export async function middleware(request: NextRequest) {
 
   // Check if user is active for all authenticated routes
   if (user && !isPublicPath) {
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("invitation_status")
       .eq("id", user.id)
       .single() as any;
+
+    // DEBUG LOG
+    console.log("🔍 Middleware check:", {
+      userId: user.id,
+      userEmail: user.email,
+      profile,
+      profileError,
+      invitation_status: profile?.invitation_status,
+    });
 
     if (profile?.invitation_status !== "active") {
       await supabase.auth.signOut();
