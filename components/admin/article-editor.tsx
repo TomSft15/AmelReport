@@ -26,7 +26,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ArticleEditorProps {
   content: string;
@@ -42,6 +42,7 @@ export function ArticleEditor({
   editable = true,
 }: ArticleEditorProps) {
   const saveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [, setForceUpdate] = useState(0);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -90,6 +91,14 @@ export function ArticleEditor({
         }, 2000);
       }
     },
+    onSelectionUpdate: () => {
+      // Force re-render pour mettre à jour les boutons actifs
+      setForceUpdate((prev) => prev + 1);
+    },
+    onTransaction: () => {
+      // Force re-render à chaque transaction (clic sur bouton)
+      setForceUpdate((prev) => prev + 1);
+    },
   });
 
   useEffect(() => {
@@ -129,7 +138,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={cn(editor.isActive("bold") && "bg-accent")}
+          className={cn(
+            editor.isActive("bold") && "bg-primary text-primary-foreground"
+          )}
         >
           <Bold className="h-4 w-4" />
         </Button>
@@ -138,7 +149,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={cn(editor.isActive("italic") && "bg-accent")}
+          className={cn(
+            editor.isActive("italic") && "bg-primary text-primary-foreground"
+          )}
         >
           <Italic className="h-4 w-4" />
         </Button>
@@ -147,7 +160,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={cn(editor.isActive("underline") && "bg-accent")}
+          className={cn(
+            editor.isActive("underline") && "bg-primary text-primary-foreground"
+          )}
         >
           <UnderlineIcon className="h-4 w-4" />
         </Button>
@@ -156,7 +171,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={cn(editor.isActive("strike") && "bg-accent")}
+          className={cn(
+            editor.isActive("strike") && "bg-primary text-primary-foreground"
+          )}
         >
           <Strikethrough className="h-4 w-4" />
         </Button>
@@ -165,7 +182,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleCode().run()}
-          className={cn(editor.isActive("code") && "bg-accent")}
+          className={cn(
+            editor.isActive("code") && "bg-primary text-primary-foreground"
+          )}
         >
           <Code className="h-4 w-4" />
         </Button>
@@ -177,7 +196,10 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={cn(editor.isActive("heading", { level: 1 }) && "bg-accent")}
+          className={cn(
+            editor.isActive("heading", { level: 1 }) &&
+              "bg-primary text-primary-foreground"
+          )}
         >
           <Heading1 className="h-4 w-4" />
         </Button>
@@ -186,7 +208,10 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={cn(editor.isActive("heading", { level: 2 }) && "bg-accent")}
+          className={cn(
+            editor.isActive("heading", { level: 2 }) &&
+              "bg-primary text-primary-foreground"
+          )}
         >
           <Heading2 className="h-4 w-4" />
         </Button>
@@ -195,7 +220,10 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={cn(editor.isActive("heading", { level: 3 }) && "bg-accent")}
+          className={cn(
+            editor.isActive("heading", { level: 3 }) &&
+              "bg-primary text-primary-foreground"
+          )}
         >
           <Heading3 className="h-4 w-4" />
         </Button>
@@ -207,7 +235,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={cn(editor.isActive("bulletList") && "bg-accent")}
+          className={cn(
+            editor.isActive("bulletList") && "bg-primary text-primary-foreground"
+          )}
         >
           <List className="h-4 w-4" />
         </Button>
@@ -216,7 +246,10 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={cn(editor.isActive("orderedList") && "bg-accent")}
+          className={cn(
+            editor.isActive("orderedList") &&
+              "bg-primary text-primary-foreground"
+          )}
         >
           <ListOrdered className="h-4 w-4" />
         </Button>
@@ -225,7 +258,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={cn(editor.isActive("blockquote") && "bg-accent")}
+          className={cn(
+            editor.isActive("blockquote") && "bg-primary text-primary-foreground"
+          )}
         >
           <Quote className="h-4 w-4" />
         </Button>
@@ -237,7 +272,9 @@ export function ArticleEditor({
           variant="ghost"
           size="sm"
           onClick={setLink}
-          className={cn(editor.isActive("link") && "bg-accent")}
+          className={cn(
+            editor.isActive("link") && "bg-primary text-primary-foreground"
+          )}
         >
           <LinkIcon className="h-4 w-4" />
         </Button>
