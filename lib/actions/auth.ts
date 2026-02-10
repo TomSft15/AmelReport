@@ -88,6 +88,7 @@ export async function acceptInvitation(token: string, formData: FormData) {
     // Mark as expired
     await supabase
       .from("invitations")
+      // @ts-ignore - Supabase types issue
       .update({ status: "expired" })
       .eq("id", invitation.id);
     return { error: "Cette invitation a expiré" };

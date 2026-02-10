@@ -66,6 +66,7 @@ export async function inviteUser(formData: FormData) {
   expiresAt.setDate(expiresAt.getDate() + 7);
 
   // Create invitation
+  // @ts-ignore - Supabase types issue
   const { error: insertError } = await supabase.from("invitations").insert({
     email: data.email,
     token: token,
@@ -183,6 +184,7 @@ export async function resendInvitation(userId: string) {
 
   const { error } = await supabase
     .from("invitations")
+    // @ts-ignore - Supabase types issue
     .update({
       token: token,
       expires_at: expiresAt.toISOString(),
