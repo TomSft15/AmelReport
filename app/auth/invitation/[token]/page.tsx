@@ -7,15 +7,16 @@ import { notFound } from "next/navigation";
 export default async function InvitationPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
+  const { token } = await params;
   const supabase = await createServerSupabaseClient();
 
   // Find profile with this token
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("email, invitation_status, invitation_expires_at")
-    .eq("invitation_token", params.token)
+    .eq("invitation_token", token)
     .single() as {
     data: {
       email: string;
@@ -89,5 +90,5 @@ export default async function InvitationPage({
     );
   }
 
-  return <InvitationForm token={params.token} email={profile.email} />;
+  return <InvitationForm token={token} email={profile.email} />;
 }
