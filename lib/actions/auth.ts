@@ -69,38 +69,61 @@ export async function acceptInvitation(token: string, formData: FormData) {
     return { error: result.error.issues[0]?.message || "Données invalides" };
   }
 
-  // Find profile with this token
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
+  // Find invitation with this token
+  const { data: invitation, error: invitationError } = await supabase
+    .from("invitations")
     .select("*")
-    .eq("invitation_token", token)
+    .eq("token", token)
     .single() as any;
 
-  if (profileError || !profile) {
+  if (invitationError || !invitation) {
     return { error: "Invitation invalide ou expirée" };
   }
 
   // Check if token is expired
   if (
-    profile.invitation_expires_at &&
-    new Date(profile.invitation_expires_at) < new Date()
+    invitation.expires_at &&
+    new Date(invitation.expires_at) < new Date()
   ) {
+    // Mark as expired
+    await supabase
+      .from("invitations")
+      .update({ status: "expired" })
+      .eq("id", invitation.id);
     return { error: "Cette invitation a expiré" };
   }
 
   // Check if already accepted
-  if (profile.invitation_status === "active") {
+  if (invitation.status === "accepted") {
     return { error: "Cette invitation a déjà été acceptée" };
   }
 
-  // Create auth user
-  const { data: authData, error: signUpError } = await supabase.auth.signUp({
-    email: profile.email,
-    password: data.password,
-    options: {
-      data: {
-        display_name: data.displayName,
+  // Create auth user using Admin API to bypass email rate limit
+  // The Admin API allows creating users without sending confirmation emails
+  // The trigger will automatically:
+  // 1. Create a profile with invitation_status = 'active', display_name, and last_login_at
+  // 2. Mark the invitation as 'accepted'
+  // 3. Set invited_by and invited_at from the invitation
+
+  // Use admin client to create user without email confirmation
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
+    }
+  );
+
+  const { data: authData, error: signUpError } = await supabaseAdmin.auth.admin.createUser({
+    email: invitation.email,
+    password: data.password,
+    email_confirm: true, // Auto-confirm email without sending
+    user_metadata: {
+      display_name: data.displayName,
     },
   });
 
@@ -112,44 +135,16 @@ export async function acceptInvitation(token: string, formData: FormData) {
     return { error: "Erreur lors de la création du compte" };
   }
 
-  // Update profile
-  const { error: updateError } = await supabase
-    .from("profiles")
-    // @ts-ignore - Supabase types issue
-    .update({
-      display_name: data.displayName,
-      invitation_status: "active",
-      invitation_token: null,
-      invitation_expires_at: null,
-      last_login_at: new Date().toISOString(),
-    })
-    .eq("id", authData.user.id);
+  // Sign in the user automatically
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: invitation.email,
+    password: data.password,
+  });
 
-  if (updateError) {
-    return { error: "Erreur lors de la mise à jour du profil" };
+  if (signInError) {
+    return { error: "Compte créé mais erreur de connexion: " + signInError.message };
   }
 
   revalidatePath("/", "layout");
   redirect("/");
-}
-
-export async function signInWithGoogle() {
-  const supabase = await createServerSupabaseClient();
-
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`,
-    },
-  });
-
-  if (error) {
-    return { error: "Erreur lors de la connexion avec Google" };
-  }
-
-  if (data.url) {
-    redirect(data.url);
-  }
-
-  return { error: "Une erreur inattendue s'est produite" };
 }
