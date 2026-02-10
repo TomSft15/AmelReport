@@ -52,13 +52,28 @@ export function UserInviteModal() {
 
   function handleClose() {
     setOpen(false);
-    setError(undefined);
-    setInvitationUrl(undefined);
-    setCopied(false);
+    // Reset state after a small delay to avoid flickering
+    setTimeout(() => {
+      setError(undefined);
+      setInvitationUrl(undefined);
+      setCopied(false);
+    }, 200);
+  }
+
+  function handleOpenChange(newOpen: boolean) {
+    setOpen(newOpen);
+    // Reset state when closing the dialog
+    if (!newOpen) {
+      setTimeout(() => {
+        setError(undefined);
+        setInvitationUrl(undefined);
+        setCopied(false);
+      }, 200);
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>
           <UserPlus className="mr-2 h-4 w-4" />
