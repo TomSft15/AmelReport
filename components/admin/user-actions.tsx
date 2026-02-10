@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { toggleUserStatus, resendInvitation } from "@/lib/actions/users";
+import { useRouter } from "next/navigation";
+import { toggleUserStatus, resendInvitation, deleteInvitation } from "@/lib/actions/users";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreVertical, Ban, CheckCircle, Mail, Copy } from "lucide-react";
+import { MoreVertical, Ban, CheckCircle, Mail, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface UserActionsProps {
@@ -32,8 +33,24 @@ interface UserActionsProps {
 }
 
 export function UserActions({ userId, email, status, isCurrentUser }: UserActionsProps) {
+  const router = useRouter();
   const [showToggleDialog, setShowToggleDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  async function handleDeleteInvitation() {
+    setIsLoading(true);
+    const result = await deleteInvitation(userId);
+
+    if (result?.error) {
+      toast.error(result.error);
+      setIsLoading(false);
+    } else {
+      toast.success("Invitation supprimée avec succès");
+      setShowDeleteDialog(false);
+      router.refresh();
+    }
+  }
 
   async function handleToggleStatus() {
     setIsLoading(true);
@@ -82,10 +99,19 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
           <DropdownMenuSeparator />
 
           {status === "pending" && (
-            <DropdownMenuItem onClick={handleResendInvitation}>
-              <Mail className="mr-2 h-4 w-4" />
-              Copier l'invitation
-            </DropdownMenuItem>
+            <>
+              <DropdownMenuItem onClick={handleResendInvitation}>
+                <Mail className="mr-2 h-4 w-4" />
+                Copier l'invitation
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Supprimer l'invitation
+              </DropdownMenuItem>
+            </>
           )}
 
           {status !== "pending" && (
@@ -135,6 +161,35 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
               disabled={isLoading}
             >
               {isLoading ? "Chargement..." : "Confirmer"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'invitation ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer l'invitation pour{" "}
+              <strong>{email}</strong> ?
+              <br />
+              <br />
+              Le lien d'invitation ne fonctionnera plus et cette personne ne
+              pourra pas créer de compte avec ce lien.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLoading}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteInvitation();
+              }}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

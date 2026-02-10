@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
+import { ArticleDeleteButton } from "@/components/admin/article-delete-button";
 
 export default async function ArticlesPage({
   searchParams,
@@ -142,11 +143,17 @@ export default async function ArticlesPage({
                       {formatDate(article.published_at || article.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/articles/edit/${article.id}`}>
-                          Modifier
-                        </Link>
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/admin/articles/edit/${article.id}`}>
+                            Modifier
+                          </Link>
+                        </Button>
+                        <ArticleDeleteButton
+                          articleId={article.id}
+                          articleTitle={article.title}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
