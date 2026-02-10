@@ -51,7 +51,7 @@ export async function logout() {
   const supabase = await createServerSupabaseClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
-  redirect("/login");
+  redirect("/auth/login");
 }
 
 export async function acceptInvitation(token: string, formData: FormData) {

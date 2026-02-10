@@ -7,13 +7,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public paths that don't require authentication
-  const publicPaths = ["/login", "/invitation"];
+  const publicPaths = ["/auth/login", "/auth/invitation"];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
   // If user is not logged in and trying to access protected route
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     if (profile?.invitation_status !== "active") {
       await supabase.auth.signOut();
       const url = request.nextUrl.clone();
-      url.pathname = "/login";
+      url.pathname = "/auth/login";
       url.searchParams.set("error", "account_disabled");
       return NextResponse.redirect(url);
     }

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
           await supabase.auth.signOut();
           return NextResponse.redirect(
             new URL(
-              "/login?error=not_invited",
+              "/auth/login?error=not_invited",
               request.url
             )
           );
@@ -69,6 +69,6 @@ export async function GET(request: NextRequest) {
 
   // Return the user to an error page with instructions
   return NextResponse.redirect(
-    new URL("/login?error=auth_callback_error", request.url)
+    new URL("/auth/login?error=auth_callback_error", request.url)
   );
 }
