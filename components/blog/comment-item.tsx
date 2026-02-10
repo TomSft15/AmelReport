@@ -72,8 +72,8 @@ export function CommentItem({
   }
 
   return (
-    <div className={depth > 0 ? "ml-8 mt-4" : "mt-6"}>
-      <div className="flex gap-4">
+    <div className={depth === 1 ? "md:ml-12 lg:ml-16 xl:ml-20 mt-4" : depth > 1 ? "mt-4" : "mt-6"}>
+      <div className="flex gap-3">
         <Avatar className="h-10 w-10 flex-shrink-0">
           <AvatarImage src={comment.user.avatar_url || undefined} />
           <AvatarFallback>
@@ -91,12 +91,12 @@ export function CommentItem({
             </span>
           </div>
 
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">
             {comment.content}
           </p>
 
           <div className="flex items-center gap-2">
-            {depth < maxDepth && (
+            {depth === 0 && (
               <Button
                 variant="ghost"
                 size="sm"

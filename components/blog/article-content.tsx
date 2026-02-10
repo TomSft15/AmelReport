@@ -5,7 +5,7 @@ interface ArticleContentProps {
 export function ArticleContent({ content }: ArticleContentProps) {
   return (
     <div
-      className="prose prose-lg max-w-none
+      className="prose md:prose-lg max-w-none
         prose-headings:font-bold
         prose-h1:text-4xl prose-h1:mt-8 prose-h1:mb-4
         prose-h2:text-3xl prose-h2:mt-6 prose-h2:mb-3

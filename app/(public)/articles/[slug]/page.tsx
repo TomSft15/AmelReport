@@ -118,7 +118,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const readingTime = calculateReadingTime(article.content);
 
   return (
-    <article className="max-w-4xl mx-auto">
+    <article className="max-w-4xl mx-auto px-6 md:px-8">
       {/* Cover Image */}
       {article.cover_image_url && (
         <div className="relative w-full h-[400px] rounded-lg overflow-hidden mb-8">
