@@ -30,6 +30,13 @@ interface CategoryFormModalProps {
 
 export function CategoryFormModal({ mode, category, trigger }: CategoryFormModalProps) {
   const [open, setOpen] = useState(false);
+
+  // Auto-open modal when mounted without trigger (edit mode from dropdown)
+  useEffect(() => {
+    if (!trigger && mode === "edit") {
+      setOpen(true);
+    }
+  }, [trigger, mode]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [name, setName] = useState(category?.name || "");

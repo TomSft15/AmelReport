@@ -84,7 +84,6 @@ export function CategoryActions({ category }: CategoryActionsProps) {
         <CategoryFormModal
           mode="edit"
           category={category}
-          trigger={<div style={{ display: "none" }} />}
         />
       )}
 
