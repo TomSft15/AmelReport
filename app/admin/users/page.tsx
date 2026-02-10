@@ -1,6 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -10,11 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserPlus } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { UserInviteModal } from "@/components/admin/user-invite-modal";
+import { UserActions } from "@/components/admin/user-actions";
 
 export default async function UsersPage() {
   const supabase = await createServerSupabaseClient();
+
+  // Get current user
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser();
 
   // Get all users
   const { data: users } = await supabase
@@ -31,10 +36,7 @@ export default async function UsersPage() {
             Gérez les invitations et les accès
           </p>
         </div>
-        <Button>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Inviter un utilisateur
-        </Button>
+        <UserInviteModal />
       </div>
 
       <Card>
@@ -54,6 +56,7 @@ export default async function UsersPage() {
                 <TableHead>Status</TableHead>
                 <TableHead>Invité le</TableHead>
                 <TableHead>Dernière connexion</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -89,6 +92,14 @@ export default async function UsersPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
                       {user.last_login_at ? formatDate(user.last_login_at) : "-"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <UserActions
+                        userId={user.id}
+                        email={user.email}
+                        status={user.invitation_status}
+                        isCurrentUser={user.id === currentUser?.id}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
