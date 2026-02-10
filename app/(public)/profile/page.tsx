@@ -61,22 +61,22 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-full overflow-hidden">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Mon Profil</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold tracking-tight break-words">Mon Profil</h1>
+        <p className="text-muted-foreground break-words">
           Gérez vos informations personnelles et votre activité
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3 max-w-full">
         {/* Statistics */}
-        <div className="space-y-6">
-          <Card>
+        <div className="space-y-6 max-w-full overflow-hidden">
+          <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle>Statistiques</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 max-w-full">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <Calendar className="h-6 w-6 text-primary" />
@@ -100,23 +100,23 @@ export default async function ProfilePage() {
           </Card>
 
           {/* Recent Comments */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardHeader>
               <CardTitle>Commentaires récents</CardTitle>
               <CardDescription>Vos 10 derniers commentaires</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="max-w-full overflow-hidden">
               {comments && comments.length > 0 ? (
                 <div className="space-y-4">
                   {comments.map((comment: any) => (
-                    <div key={comment.id} className="space-y-2 pb-4 border-b last:border-0">
+                    <div key={comment.id} className="space-y-2 pb-4 border-b last:border-0 max-w-full overflow-hidden">
                       <Link
                         href={`/articles/${comment.articles?.slug}`}
-                        className="text-sm font-medium hover:underline"
+                        className="text-sm font-medium hover:underline break-words block"
                       >
                         {comment.articles?.title}
                       </Link>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground break-words">
                         {truncate(comment.content, 80)}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -136,7 +136,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* Profile Form */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 max-w-full overflow-hidden">
           <ProfileForm
             user={{
               email: user.email!,

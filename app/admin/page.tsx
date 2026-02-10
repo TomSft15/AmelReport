@@ -104,7 +104,7 @@ export default async function AdminDashboard() {
         <CardHeader>
           <CardTitle>Actions rapides</CardTitle>
         </CardHeader>
-        <CardContent className="flex gap-4">
+        <CardContent className="flex flex-wrap gap-4">
           <Button asChild>
             <Link href="/admin/articles/new">Nouvel article</Link>
           </Button>
@@ -116,14 +116,14 @@ export default async function AdminDashboard() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Recent Articles */}
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Articles récents</CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin/articles">Voir tout</Link>
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -136,7 +136,7 @@ export default async function AdminDashboard() {
                 {recentArticles && recentArticles.length > 0 ? (
                   recentArticles.map((article: any) => (
                     <TableRow key={article.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium max-w-[200px] truncate">
                         {article.title}
                       </TableCell>
                       <TableCell>
@@ -170,14 +170,14 @@ export default async function AdminDashboard() {
         </Card>
 
         {/* Recent Comments */}
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Commentaires récents</CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/admin/comments">Voir tout</Link>
             </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -190,10 +190,10 @@ export default async function AdminDashboard() {
                 {recentComments && recentComments.length > 0 ? (
                   recentComments.map((comment: any) => (
                     <TableRow key={comment.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium max-w-[120px] truncate">
                         {comment.profiles?.display_name || "Anonyme"}
                       </TableCell>
-                      <TableCell className="truncate max-w-[200px]">
+                      <TableCell className="truncate max-w-[150px]">
                         {comment.content}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">

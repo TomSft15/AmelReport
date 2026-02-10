@@ -97,22 +97,22 @@ export function ProfileForm({ user }: ProfileFormProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-hidden">
       {/* Avatar Section */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Avatar</CardTitle>
           <CardDescription>Changez votre photo de profil</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-6">
-            <Avatar className="h-24 w-24">
+        <CardContent className="space-y-4 max-w-full">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <Avatar className="h-24 w-24 flex-shrink-0">
               <AvatarImage src={avatarUrl || undefined} />
               <AvatarFallback className="text-2xl">
                 {displayName[0]?.toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="w-full sm:w-auto text-center sm:text-left">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -139,7 +139,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                   </>
                 )}
               </Button>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-2 break-words">
                 JPEG, PNG, WebP ou GIF (max 2 MB)
               </p>
             </div>
@@ -148,13 +148,13 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </Card>
 
       {/* Profile Information */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Informations du profil</CardTitle>
           <CardDescription>Modifiez vos informations personnelles</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleProfileUpdate} className="space-y-4">
+        <CardContent className="max-w-full">
+          <form onSubmit={handleProfileUpdate} className="space-y-4 max-w-full">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={user.email} disabled />
@@ -191,15 +191,15 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </Card>
 
       {/* Password Change */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader>
           <CardTitle>Changer le mot de passe</CardTitle>
           <CardDescription>
             Assurez-vous d&apos;utiliser un mot de passe fort
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handlePasswordChange} className="space-y-4">
+        <CardContent className="max-w-full">
+          <form onSubmit={handlePasswordChange} className="space-y-4 max-w-full">
             <div className="space-y-2">
               <Label htmlFor="newPassword">Nouveau mot de passe</Label>
               <Input
