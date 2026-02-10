@@ -50,7 +50,7 @@ export function CommentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 w-full">
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -58,7 +58,7 @@ export function CommentForm({
         rows={4}
         maxLength={2000}
         disabled={isLoading}
-        className="resize-none"
+        className="resize-none w-full break-words"
       />
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">

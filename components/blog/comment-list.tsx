@@ -78,7 +78,7 @@ export function CommentList({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 w-full max-w-full overflow-hidden">
       <Separator />
 
       <div>
