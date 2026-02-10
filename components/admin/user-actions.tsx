@@ -84,26 +84,28 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
           {status === "pending" && (
             <DropdownMenuItem onClick={handleResendInvitation}>
               <Mail className="mr-2 h-4 w-4" />
-              Renvoyer l'invitation
+              Copier l'invitation
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem
-            onClick={() => setShowToggleDialog(true)}
-            className={status === "active" ? "text-destructive" : ""}
-          >
-            {status === "active" ? (
-              <>
-                <Ban className="mr-2 h-4 w-4" />
-                Désactiver
-              </>
-            ) : (
-              <>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Activer
-              </>
-            )}
-          </DropdownMenuItem>
+          {status !== "pending" && (
+            <DropdownMenuItem
+              onClick={() => setShowToggleDialog(true)}
+              className={status === "active" ? "text-destructive" : ""}
+            >
+              {status === "active" ? (
+                <>
+                  <Ban className="mr-2 h-4 w-4" />
+                  Désactiver
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Activer
+                </>
+              )}
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
