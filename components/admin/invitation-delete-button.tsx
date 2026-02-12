@@ -61,8 +61,8 @@ export function InvitationDeleteButton({
             <span className="font-semibold">{email}</span> ?
             <br />
             <br />
-            Le lien d'invitation ne fonctionnera plus et cette personne ne
-            pourra pas créer de compte avec ce lien.
+            Le code ne fonctionnera plus et cette personne ne
+            pourra pas créer de compte avec ce code.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

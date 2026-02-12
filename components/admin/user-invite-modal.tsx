@@ -14,39 +14,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, Copy, CheckCircle2 } from "lucide-react";
+import { UserPlus, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function UserInviteModal() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [invitationUrl, setInvitationUrl] = useState<string | undefined>();
-  const [copied, setCopied] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [invitedEmail, setInvitedEmail] = useState<string>("");
+  const [invitationCode, setInvitationCode] = useState<string>("");
+  const [signupUrl, setSignupUrl] = useState<string>("");
 
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(undefined);
-    setInvitationUrl(undefined);
+    setSuccess(false);
 
+    const email = formData.get("email") as string;
     const result = await inviteUser(formData);
 
     if (result?.error) {
       setError(result.error);
       setIsLoading(false);
-    } else if (result?.success && result?.invitationUrl) {
-      setInvitationUrl(result.invitationUrl);
+    } else if (result?.success) {
+      setSuccess(true);
+      setInvitedEmail(email);
+      setInvitationCode(result.code || "");
+      setSignupUrl(result.signupUrl || "");
       setIsLoading(false);
-      toast.success("Invitation envoyée avec succès !");
-    }
-  }
-
-  function handleCopy() {
-    if (invitationUrl) {
-      navigator.clipboard.writeText(invitationUrl);
-      setCopied(true);
-      toast.success("Lien copié !");
-      setTimeout(() => setCopied(false), 2000);
+      toast.success("Code d'invitation créé !");
     }
   }
 
@@ -55,8 +52,10 @@ export function UserInviteModal() {
     // Reset state after a small delay to avoid flickering
     setTimeout(() => {
       setError(undefined);
-      setInvitationUrl(undefined);
-      setCopied(false);
+      setSuccess(false);
+      setInvitedEmail("");
+      setInvitationCode("");
+      setSignupUrl("");
     }, 200);
   }
 
@@ -66,8 +65,10 @@ export function UserInviteModal() {
     if (!newOpen) {
       setTimeout(() => {
         setError(undefined);
-        setInvitationUrl(undefined);
-        setCopied(false);
+        setSuccess(false);
+        setInvitedEmail("");
+        setInvitationCode("");
+        setSignupUrl("");
       }, 200);
     }
   }
@@ -82,13 +83,13 @@ export function UserInviteModal() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Inviter un nouvel utilisateur</DialogTitle>
+          <DialogTitle>Créer un code d'invitation</DialogTitle>
           <DialogDescription>
-            Envoyez une invitation par email pour donner accès au blog.
+            Générez un code pour permettre à quelqu'un de créer un compte.
           </DialogDescription>
         </DialogHeader>
 
-        {!invitationUrl ? (
+        {!success ? (
           <form action={handleSubmit} className="space-y-4">
             {error && (
               <Alert variant="destructive">
@@ -96,7 +97,7 @@ export function UserInviteModal() {
               </Alert>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-2" suppressHydrationWarning>
               <Label htmlFor="email">Adresse email</Label>
               <Input
                 id="email"
@@ -118,7 +119,7 @@ export function UserInviteModal() {
                 Annuler
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Envoi..." : "Envoyer l'invitation"}
+                {isLoading ? "Création..." : "Créer le code"}
               </Button>
             </div>
           </form>
@@ -127,33 +128,31 @@ export function UserInviteModal() {
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                Invitation créée avec succès ! Partagez ce lien avec la personne invitée :
+                Code créé avec succès pour <strong>{invitedEmail}</strong> !
               </AlertDescription>
             </Alert>
 
-            <div className="flex gap-2">
-              <Input
-                value={invitationUrl}
-                readOnly
-                className="font-mono text-sm"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={handleCopy}
-              >
-                {copied ? (
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+            <div className="space-y-3 rounded-lg border bg-muted/50 p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium mb-2">Code d'invitation :</p>
+                <div className="inline-flex items-center gap-2 bg-background rounded-lg px-6 py-3 border-2 border-primary">
+                  <span className="text-3xl font-bold font-mono tracking-widest">
+                    {invitationCode}
+                  </span>
+                </div>
+              </div>
 
-            <p className="text-xs text-muted-foreground">
-              Ce lien expire dans 7 jours. L'invitation a également été envoyée par email.
-            </p>
+              <div className="space-y-2 pt-2 border-t">
+                <p className="text-sm font-medium">Instructions :</p>
+                <ol className="text-sm text-muted-foreground space-y-1 pl-5 list-decimal">
+                  <li>Partagez le code <strong>{invitationCode}</strong></li>
+                  <li>L'utilisateur entre le code dans le formulaire d'inscription</li>
+                </ol>
+                <p className="text-sm text-muted-foreground pt-2">
+                  ⏱️ Le code expire dans 7 jours
+                </p>
+              </div>
+            </div>
 
             <div className="flex justify-end">
               <Button onClick={handleClose}>Fermer</Button>

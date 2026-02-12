@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { acceptInvitation } from "@/lib/actions/auth";
+import { signupWithCode } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
 
-export function InvitationForm({ token, email }: { token: string; email: string }) {
+export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
@@ -16,7 +17,7 @@ export function InvitationForm({ token, email }: { token: string; email: string 
     setIsLoading(true);
     setError(undefined);
 
-    const result = await acceptInvitation(token, formData);
+    const result = await signupWithCode(formData);
 
     if (result?.error) {
       setError(result.error);
@@ -25,13 +26,13 @@ export function InvitationForm({ token, email }: { token: string; email: string 
   }
 
   return (
-    <Card>
+    <Card className="max-w-md w-full">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">
-          Accepter l'invitation
+          Créer un compte
         </CardTitle>
         <CardDescription className="text-center">
-          Créez votre compte pour rejoindre le blog d'Amel
+          Utilisez votre code d'invitation pour créer votre compte
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -41,13 +42,34 @@ export function InvitationForm({ token, email }: { token: string; email: string 
           </Alert>
         )}
 
-        <div className="space-y-2">
-          <Label>Email</Label>
-          <Input value={email} disabled />
-        </div>
-
         <form action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-2" suppressHydrationWarning>
+            <Label htmlFor="code">Code d'invitation</Label>
+            <Input
+              id="code"
+              name="code"
+              type="text"
+              placeholder="ABC123"
+              required
+              disabled={isLoading}
+              maxLength={6}
+              className="uppercase"
+            />
+          </div>
+
+          <div className="space-y-2" suppressHydrationWarning>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="nom@exemple.com"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="displayName">Nom d'affichage</Label>
             <Input
               id="displayName"
@@ -60,7 +82,8 @@ export function InvitationForm({ token, email }: { token: string; email: string 
               maxLength={50}
             />
           </div>
-          <div className="space-y-2">
+
+          <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="password">Mot de passe</Label>
             <Input
               id="password"
@@ -72,7 +95,8 @@ export function InvitationForm({ token, email }: { token: string; email: string 
               minLength={8}
             />
           </div>
-          <div className="space-y-2">
+
+          <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
             <Input
               id="confirmPassword"
@@ -84,10 +108,20 @@ export function InvitationForm({ token, email }: { token: string; email: string 
               minLength={8}
             />
           </div>
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Création du compte..." : "Créer mon compte"}
           </Button>
         </form>
+
+        <div className="text-center mt-4">
+          <p className="text-sm text-muted-foreground">
+            Vous avez déjà un compte ?{" "}
+            <Link href="/auth/login" className="text-primary hover:underline font-medium">
+              Se connecter
+            </Link>
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

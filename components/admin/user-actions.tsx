@@ -74,9 +74,28 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
 
     if (result?.error) {
       toast.error(result.error);
-    } else if (result?.invitationUrl) {
-      navigator.clipboard.writeText(result.invitationUrl);
-      toast.success("Lien d'invitation copié !");
+    } else if (result?.code && result?.signupUrl) {
+      const invitationText = `Code d'invitation : ${result.code}\n\nLien d'inscription : ${result.signupUrl}\n\nValable 7 jours`;
+
+      try {
+        await navigator.clipboard.writeText(invitationText);
+        toast.success("Code d'invitation copié !");
+      } catch (err) {
+        // Fallback pour navigateurs sans permission clipboard
+        const textarea = document.createElement('textarea');
+        textarea.value = invitationText;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+          document.execCommand('copy');
+          toast.success("Code d'invitation copié !");
+        } catch (fallbackErr) {
+          toast.error("Impossible de copier le code");
+        }
+        document.body.removeChild(textarea);
+      }
     }
 
     setIsLoading(false);
@@ -101,8 +120,8 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
           {status === "pending" && (
             <>
               <DropdownMenuItem onClick={handleResendInvitation}>
-                <Mail className="mr-2 h-4 w-4" />
-                Copier l'invitation
+                <Copy className="mr-2 h-4 w-4" />
+                Copier le code
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setShowDeleteDialog(true)}
@@ -175,8 +194,8 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
               <strong>{email}</strong> ?
               <br />
               <br />
-              Le lien d'invitation ne fonctionnera plus et cette personne ne
-              pourra pas créer de compte avec ce lien.
+              Le code ne fonctionnera plus et cette personne ne
+              pourra pas créer de compte avec ce code.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

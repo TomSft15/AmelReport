@@ -155,7 +155,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </CardHeader>
         <CardContent className="max-w-full">
           <form onSubmit={handleProfileUpdate} className="space-y-4 max-w-full">
-            <div className="space-y-2">
+            <div className="space-y-2" suppressHydrationWarning>
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={user.email} disabled />
               <p className="text-xs text-muted-foreground">
@@ -163,7 +163,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2" suppressHydrationWarning>
               <Label htmlFor="displayName">Nom d&apos;affichage</Label>
               <Input
                 id="displayName"
@@ -200,7 +200,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </CardHeader>
         <CardContent className="max-w-full">
           <form onSubmit={handlePasswordChange} className="space-y-4 max-w-full">
-            <div className="space-y-2">
+            <div className="space-y-2" suppressHydrationWarning>
               <Label htmlFor="newPassword">Nouveau mot de passe</Label>
               <Input
                 id="newPassword"
@@ -212,7 +212,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2" suppressHydrationWarning>
               <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
               <Input
                 id="confirmPassword"

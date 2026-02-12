@@ -109,7 +109,6 @@ export async function createArticle(formData: FormData) {
     .single()) as any;
 
   if (articleError || !article) {
-    console.error("Article creation error:", articleError);
     return {
       error: articleError?.message || "Erreur lors de la création de l'article",
     };
@@ -198,7 +197,6 @@ export async function updateArticle(id: string, formData: FormData) {
     .eq("id", id);
 
   if (articleError) {
-    console.error("Article update error:", articleError);
     return {
       error: articleError?.message || "Erreur lors de la mise à jour de l'article",
     };

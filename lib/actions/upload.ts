@@ -51,7 +51,6 @@ export async function uploadImage(formData: FormData) {
     });
 
   if (uploadError) {
-    console.error("Upload error:", uploadError);
     return { error: "Erreur lors de l'upload de l'image" };
   }
 

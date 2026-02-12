@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Link from "next/link";
 
 export function LoginForm({ error }: { error?: string }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +45,7 @@ export function LoginForm({ error }: { error?: string }) {
         )}
 
         <form action={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -55,12 +56,13 @@ export function LoginForm({ error }: { error?: string }) {
               disabled={isLoading}
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="password">Mot de passe</Label>
             <Input
               id="password"
               name="password"
               type="password"
+              placeholder="Votre mot de passe"
               required
               disabled={isLoading}
             />
@@ -69,6 +71,15 @@ export function LoginForm({ error }: { error?: string }) {
             {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
         </form>
+
+        <div className="text-center mt-4">
+          <p className="text-sm text-muted-foreground">
+            Vous avez un code d'invitation ?{" "}
+            <Link href="/auth/signup" className="text-primary hover:underline font-medium">
+              Créer un compte
+            </Link>
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

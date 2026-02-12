@@ -40,7 +40,7 @@ export default async function UsersPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Utilisateurs</h1>
           <p className="text-muted-foreground">
-            Gérez les invitations et les accès
+            Gérez les codes d'invitation et les accès
           </p>
         </div>
         <UserInviteModal />

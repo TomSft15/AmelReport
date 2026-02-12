@@ -60,15 +60,22 @@ export async function inviteUser(formData: FormData) {
     return { error: "Une invitation est déjà en attente pour cet email" };
   }
 
-  // Generate token and expiration (7 days)
+  // Generate a simple 6-character code (uppercase letters + numbers)
+  const code = Array.from({ length: 6 }, () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    return chars[Math.floor(Math.random() * chars.length)];
+  }).join('');
+
+  // Token for internal use
   const token = crypto.randomUUID();
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  // Create invitation
+  // Create invitation record with code
   // @ts-ignore - Supabase types issue
   const { error: insertError } = await supabase.from("invitations").insert({
     email: data.email,
+    code: code,
     token: token,
     expires_at: expiresAt.toISOString(),
     status: "pending",
@@ -76,17 +83,17 @@ export async function inviteUser(formData: FormData) {
   });
 
   if (insertError) {
-    console.error("Error creating invitation:", insertError);
-    return { error: "Erreur lors de la création de l'invitation" };
+    return { error: "Erreur lors de la création de l'invitation: " + insertError.message };
   }
-
-  // In production, send email here using Supabase Auth
-  // For now, we'll just return the invitation link
-  const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/invitation/${token}`;
 
   revalidatePath("/admin/users");
 
-  return { success: true, invitationUrl };
+  return {
+    success: true,
+    code: code,
+    signupUrl: `${process.env.NEXT_PUBLIC_APP_URL}/auth/signup`,
+    message: `Code créé : ${code}`
+  };
 }
 
 export async function toggleUserStatus(userId: string) {
@@ -177,30 +184,16 @@ export async function resendInvitation(userId: string) {
     return { error: "Cette invitation a déjà été acceptée" };
   }
 
-  // Generate new token and expiration
-  const token = crypto.randomUUID();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
-
-  const { error } = await supabase
-    .from("invitations")
-    // @ts-ignore - Supabase types issue
-    .update({
-      token: token,
-      expires_at: expiresAt.toISOString(),
-    })
-    .eq("id", userId);
-
-  if (error) {
-    console.error("Error resending invitation:", error);
-    return { error: "Erreur lors du renvoi de l'invitation" };
-  }
-
-  const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/invitation/${token}`;
+  // Return the existing code and signup URL
+  const signupUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/signup`;
 
   revalidatePath("/admin/users");
 
-  return { success: true, invitationUrl };
+  return {
+    success: true,
+    code: invitation.code,
+    signupUrl: signupUrl
+  };
 }
 
 export async function deleteInvitation(invitationId: string) {
@@ -232,7 +225,6 @@ export async function deleteInvitation(invitationId: string) {
     .eq("id", invitationId);
 
   if (error) {
-    console.error("Error deleting invitation:", error);
     return { error: "Erreur lors de la suppression de l'invitation" };
   }
 

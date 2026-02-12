@@ -7,21 +7,30 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public paths that don't require authentication
-  const publicPaths = ["/auth/login", "/auth/invitation"];
+  const publicPaths = ["/auth/login", "/auth/invitation", "/auth/callback", "/auth/signup"];
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path));
 
+  // Special paths for invitation flow - accessible with auth but shouldn't redirect
+  const invitationFlowPaths = ["/api/auth/callback", "/auth/complete-profile", "/auth/callback"];
+  const isInvitationFlow = invitationFlowPaths.some((path) => pathname.startsWith(path));
+
   // If user is not logged in and trying to access protected route
-  if (!user && !isPublicPath) {
+  if (!user && !isPublicPath && !isInvitationFlow) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in and trying to access auth pages
-  if (user && isPublicPath) {
+  // If user is logged in and trying to access auth pages (but not invitation flow)
+  if (user && isPublicPath && !isInvitationFlow) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
+  }
+
+  // Skip status check for invitation flow paths
+  if (isInvitationFlow) {
+    return supabaseResponse;
   }
 
   // Check admin access for /admin routes
