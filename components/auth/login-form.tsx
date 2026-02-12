@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export function LoginForm({ error }: { error?: string }) {
@@ -44,7 +45,10 @@ export function LoginForm({ error }: { error?: string }) {
           </Alert>
         )}
 
-        <form action={handleSubmit} className="space-y-4">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(new FormData(e.currentTarget));
+        }} className="space-y-4">
           <div className="space-y-2" suppressHydrationWarning>
             <Label htmlFor="email">Email</Label>
             <Input
@@ -68,6 +72,7 @@ export function LoginForm({ error }: { error?: string }) {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? "Connexion..." : "Se connecter"}
           </Button>
         </form>

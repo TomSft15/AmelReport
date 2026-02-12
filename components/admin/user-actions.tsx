@@ -119,13 +119,14 @@ export function UserActions({ userId, email, status, isCurrentUser }: UserAction
 
           {status === "pending" && (
             <>
-              <DropdownMenuItem onClick={handleResendInvitation}>
+              <DropdownMenuItem onClick={handleResendInvitation} disabled={isLoading}>
                 <Copy className="mr-2 h-4 w-4" />
-                Copier le code
+                {isLoading ? "Copie..." : "Copier le code"}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setShowDeleteDialog(true)}
                 className="text-destructive"
+                disabled={isLoading}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Supprimer l'invitation

@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface CommentDeleteButtonProps {
@@ -55,6 +55,7 @@ export function CommentDeleteButton({ commentId }: CommentDeleteButtonProps) {
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction onClick={handleDelete} disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? "Suppression..." : "Supprimer"}
           </AlertDialogAction>
         </AlertDialogFooter>

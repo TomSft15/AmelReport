@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createComment } from "@/lib/actions/comments";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface CommentFormProps {
@@ -76,6 +77,7 @@ export function CommentForm({
             </Button>
           )}
           <Button type="submit" disabled={isLoading || !content.trim()}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isLoading ? "Publication..." : "Publier"}
           </Button>
         </div>

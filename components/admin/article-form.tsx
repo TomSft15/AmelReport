@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { CategorySelector } from "@/components/admin/category-selector";
 import { ArticleEditor } from "@/components/admin/article-editor";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save, Eye, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 
@@ -142,11 +142,19 @@ export function ArticleForm({ mode, categories, article }: ArticleFormProps) {
             onClick={() => handleSubmit("draft")}
             disabled={isLoading}
           >
-            <Save className="mr-2 h-4 w-4" />
-            Sauvegarder brouillon
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="mr-2 h-4 w-4" />
+            )}
+            {isLoading ? "Sauvegarde..." : "Sauvegarder brouillon"}
           </Button>
           <Button onClick={() => handleSubmit("published")} disabled={isLoading}>
-            <Eye className="mr-2 h-4 w-4" />
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Eye className="mr-2 h-4 w-4" />
+            )}
             {isLoading ? "Publication..." : "Publier"}
           </Button>
         </div>

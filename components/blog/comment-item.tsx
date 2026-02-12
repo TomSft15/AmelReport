@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { formatRelativeDate } from "@/lib/utils";
-import { Reply, Trash2 } from "lucide-react";
+import { Reply, Trash2, Loader2 } from "lucide-react";
 import { CommentForm } from "./comment-form";
 import { deleteComment } from "@/lib/actions/comments";
 import {
@@ -130,9 +130,10 @@ export function CommentItem({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>
-                      Supprimer
+                    <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+                      {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {isDeleting ? "Suppression..." : "Supprimer"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

@@ -21,7 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { CategoryFormModal } from "./category-form-modal";
 
@@ -108,6 +108,7 @@ export function CategoryActions({ category }: CategoryActionsProps) {
               disabled={isLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
           </AlertDialogFooter>

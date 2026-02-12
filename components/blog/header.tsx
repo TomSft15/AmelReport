@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Settings, LogOut, Home } from "lucide-react";
+import { User, Settings, LogOut, Home, Loader2 } from "lucide-react";
 import { logout } from "@/lib/actions/auth";
 
 interface HeaderProps {
@@ -88,7 +88,11 @@ export function Header({ user }: HeaderProps) {
               disabled={isLoading}
               className="cursor-pointer text-destructive focus:text-destructive"
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-4 w-4" />
+              )}
               <span>{isLoading ? "Déconnexion..." : "Se déconnecter"}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

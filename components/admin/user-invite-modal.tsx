@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { UserPlus, CheckCircle2 } from "lucide-react";
+import { UserPlus, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function UserInviteModal() {
@@ -90,7 +90,10 @@ export function UserInviteModal() {
         </DialogHeader>
 
         {!success ? (
-          <form action={handleSubmit} className="space-y-4">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit(new FormData(e.currentTarget));
+          }} className="space-y-4">
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -119,6 +122,7 @@ export function UserInviteModal() {
                 Annuler
               </Button>
               <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {isLoading ? "Création..." : "Créer le code"}
               </Button>
             </div>
